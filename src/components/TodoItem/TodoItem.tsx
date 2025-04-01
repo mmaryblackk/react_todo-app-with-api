@@ -30,7 +30,7 @@ export const TodoItem: React.FC<Props> = ({
     if (isEditing && editInputField.current) {
       editInputField.current.focus();
     }
-  }, [isEditing]);
+  }, [isEditing, editInputField]);
 
   const handleDelete = async () => {
     await onDelete(id);
@@ -57,7 +57,13 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     if (!editTitle.trim()) {
-      await handleDelete();
+      try {
+        await handleDelete();
+      } catch {
+        setTimeout(() => {
+          editInputField.current?.focus();
+        }, 0);
+      }
 
       return;
     }
@@ -68,10 +74,17 @@ export const TodoItem: React.FC<Props> = ({
 
         if (success) {
           setIsEditing(false);
+        } else {
+          setTimeout(() => {
+            editInputField.current?.focus();
+          }, 0);
         }
       }
     } catch {
       // Error is handled in onUpdate
+      setTimeout(() => {
+        editInputField.current?.focus();
+      }, 0);
     }
   };
 
@@ -112,28 +125,28 @@ export const TodoItem: React.FC<Props> = ({
             onKeyUp={handleKeyUp}
             ref={editInputField}
             disabled={isLoading}
+            autoFocus
           />
         </form>
       ) : (
-        <span
-          data-cy="TodoTitle"
-          className="todo__title"
-          onDoubleClick={handleDoubleClick}
-        >
-          {title}
-        </span>
-      )}
-
-      {!isEditing && (
-        <button
-          type="button"
-          className="todo__remove"
-          data-cy="TodoDelete"
-          onClick={handleDelete}
-          disabled={isLoading}
-        >
-          ×
-        </button>
+        <>
+          <span
+            data-cy="TodoTitle"
+            className="todo__title"
+            onDoubleClick={handleDoubleClick}
+          >
+            {title}
+          </span>
+          <button
+            type="button"
+            className="todo__remove"
+            data-cy="TodoDelete"
+            onClick={handleDelete}
+            disabled={isLoading}
+          >
+            ×
+          </button>
+        </>
       )}
 
       <div

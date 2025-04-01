@@ -25,7 +25,6 @@ import { ErrorType } from './types/Error';
 import { Loader } from './components/Loader/Loader';
 import { filterTodos } from './utils/filter';
 import { TempTodoItem } from './components/TempTodoItem/TempTodoItem';
-import { CSSTransition } from 'react-transition-group';
 
 export const App: React.FC = () => {
   // #region states
@@ -35,7 +34,9 @@ export const App: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<ErrorType>(
     ErrorType.noError,
   );
-  const [filterField, setFilterField] = useState(FilterOption.all);
+  const [filterField, setFilterField] = useState<FilterOption>(
+    FilterOption.all,
+  );
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
   const [deletedTodos, setDeletedTodos] = useState<number[]>([]);
@@ -104,7 +105,7 @@ export const App: React.FC = () => {
 
   // #region adding & deletind todos
 
-  const handleAddTodo = async (title: string) => {
+  const handleAddTodo = useCallback(async (title: string) => {
     if (!title.trim()) {
       setErrorMessage(ErrorType.emptyTitle);
 
@@ -133,9 +134,9 @@ export const App: React.FC = () => {
     } finally {
       setTempTodo(null);
     }
-  };
+  }, []);
 
-  const handleDeleteTodo = async (todoId: number) => {
+  const handleDeleteTodo = useCallback(async (todoId: number) => {
     setDeletedTodos(currentTodos => [...currentTodos, todoId]);
 
     try {
@@ -147,13 +148,13 @@ export const App: React.FC = () => {
     } finally {
       setDeletedTodos(currentTodos => currentTodos.filter(id => id !== todoId));
     }
-  };
+  }, []);
 
-  const handleClearCompletedTodos = () => {
+  const handleClearCompletedTodos = useCallback(() => {
     const completedTodos = todos.filter(todo => todo.completed);
 
     completedTodos.forEach(todo => handleDeleteTodo(todo.id));
-  };
+  }, [handleDeleteTodo, todos]);
 
   // #endregion
 
@@ -216,11 +217,7 @@ export const App: React.FC = () => {
               onUpdate={handleUpdateTodo}
               updatingIds={updatingIds}
             />
-            {tempTodo && (
-              <CSSTransition key={0} timeout={300} classNames="temp-item">
-                <TempTodoItem todo={tempTodo} isLoading />
-              </CSSTransition>
-            )}
+            {tempTodo && <TempTodoItem todo={tempTodo} isLoading />}
           </section>
           {todos.length > 0 && (
             <TodoFilter
