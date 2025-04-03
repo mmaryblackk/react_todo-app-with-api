@@ -34,7 +34,7 @@ export const App: React.FC = () => {
     ErrorType.noError,
   );
   const [filterField, setFilterField] = useState<FilterOption>(
-    FilterOption.all,
+    FilterOption.All,
   );
   const [tempTodo, setTempTodo] = useState<Todo | null>(null);
 
@@ -143,37 +143,45 @@ export const App: React.FC = () => {
 
   // #region updating todos
 
-  const handleUpdateTodo = async (todoId: number, data: Partial<Todo>) => {
-    setUpdatingIds(currentTodos => [...currentTodos, todoId]);
+  const handleUpdateTodo = useCallback(
+    async (todoId: number, data: Partial<Todo>) => {
+      setUpdatingIds(currentTodos => [...currentTodos, todoId]);
 
-    try {
-      const updatedTodo = await updateTodo(todoId, data);
+      try {
+        const updatedTodo = await updateTodo(todoId, data);
 
-      setTodos(currentTodos =>
-        currentTodos.map(todo => (todo.id === todoId ? updatedTodo : todo)),
+        setTodos(currentTodos =>
+          currentTodos.map(todo => (todo.id === todoId ? updatedTodo : todo)),
+        );
+
+        return true;
+      } catch {
+        setErrorMessage(ErrorType.updating);
+
+        return false;
+      } finally {
+        setUpdatingIds(currentTodos =>
+          currentTodos.filter(id => id !== todoId),
+        );
+      }
+    },
+    [],
+  );
+
+  const handleToggleAll = useCallback(
+    async (completed: boolean) => {
+      const todosToUpdate = todos.filter(todo => todo.completed !== completed);
+
+      if (!todosToUpdate.length) {
+        return;
+      }
+
+      await Promise.all(
+        todosToUpdate.map(todo => handleUpdateTodo(todo.id, { completed })),
       );
-
-      return true;
-    } catch {
-      setErrorMessage(ErrorType.updating);
-
-      return false;
-    } finally {
-      setUpdatingIds(currentTodos => currentTodos.filter(id => id !== todoId));
-    }
-  };
-
-  const handleToggleAll = async (completed: boolean) => {
-    const todosToUpdate = todos.filter(todo => todo.completed !== completed);
-
-    if (!todosToUpdate.length) {
-      return;
-    }
-
-    await Promise.all(
-      todosToUpdate.map(todo => handleUpdateTodo(todo.id, { completed })),
-    );
-  };
+    },
+    [handleUpdateTodo, todos],
+  );
 
   // #endregion
 

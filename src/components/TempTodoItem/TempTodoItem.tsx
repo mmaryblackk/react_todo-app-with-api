@@ -1,6 +1,7 @@
 import classNames from 'classnames';
 import { Todo } from '../../types/Todo';
 import { Loader } from '../Loader/Loader';
+import { memo } from 'react';
 
 /* eslint-disable jsx-a11y/label-has-associated-control */
 type Props = {
@@ -8,7 +9,7 @@ type Props = {
   isLoading?: boolean;
 };
 
-export const TempTodoItem: React.FC<Props> = ({ todo, isLoading }) => {
+export const TempTodoItem: React.FC<Props> = memo(({ todo, isLoading }) => {
   const { completed, title } = todo;
 
   return (
@@ -36,4 +37,6 @@ export const TempTodoItem: React.FC<Props> = ({ todo, isLoading }) => {
       {isLoading && <Loader />}
     </div>
   );
-};
+});
+
+TempTodoItem.displayName = 'TempTodoItem';
