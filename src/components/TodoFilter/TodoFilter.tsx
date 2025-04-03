@@ -15,12 +15,21 @@ export const TodoFilter: React.FC<Props> = ({
   onFilter,
   onClearCompleted,
 }) => {
-  const activeTodosCount = todos.filter(todo => todo.completed).length;
+  const completedTodosCount = todos.filter(todo => todo.completed).length;
+  const activeTodosCount = todos.filter(todo => !todo.completed).length;
+
+  const getItemsText = (count: number) => {
+    if (count === 0) {
+      return 'Good job :)';
+    }
+
+    return `${count} item${count > 1 ? 's' : ''} left`;
+  };
 
   return (
     <footer className="todoapp__footer" data-cy="Footer">
       <span className="todo-count" data-cy="TodosCounter">
-        {todos.filter(todo => !todo.completed).length} items left
+        {getItemsText(activeTodosCount)}
       </span>
 
       <nav className="filter" data-cy="Filter">
@@ -63,7 +72,7 @@ export const TodoFilter: React.FC<Props> = ({
         className="todoapp__clear-completed"
         data-cy="ClearCompletedButton"
         onClick={onClearCompleted}
-        disabled={activeTodosCount === 0}
+        disabled={!completedTodosCount}
       >
         Clear completed
       </button>

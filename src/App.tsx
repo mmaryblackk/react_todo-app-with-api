@@ -29,7 +29,7 @@ export const App: React.FC = () => {
   // #region states
 
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<ErrorType>(
     ErrorType.noError,
   );
@@ -48,7 +48,7 @@ export const App: React.FC = () => {
   // #region loading data
 
   const loadData = async () => {
-    setLoading(true);
+    setIsLoading(true);
     try {
       const fetchedTodos = await getTodos();
 
@@ -56,7 +56,7 @@ export const App: React.FC = () => {
     } catch (error) {
       setErrorMessage(ErrorType.loading);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
@@ -67,22 +67,6 @@ export const App: React.FC = () => {
   // #endregion
 
   // #region handling error
-
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout;
-
-    if (errorMessage) {
-      timeoutId = setTimeout(() => {
-        setErrorMessage(ErrorType.noError);
-      }, 3000);
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    };
-  }, [errorMessage]);
 
   const clearErrorMessage = useCallback(() => {
     setErrorMessage(ErrorType.noError);
@@ -197,7 +181,7 @@ export const App: React.FC = () => {
     <div className="todoapp">
       <h1 className="todoapp__title">todos</h1>
 
-      {loading ? (
+      {isLoading ? (
         <Loader />
       ) : (
         <div className="todoapp__content">
@@ -230,6 +214,7 @@ export const App: React.FC = () => {
       )}
       <Error
         errorMessage={errorMessage}
+        setErrorMessage={setErrorMessage}
         clearErrorMessage={clearErrorMessage}
       />
     </div>
