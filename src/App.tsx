@@ -24,7 +24,6 @@ import { FilterOption } from './types/Filter';
 import { ErrorType } from './types/Error';
 import { Loader } from './components/Loader/Loader';
 import { filterTodos } from './utils/filter';
-import { TempTodoItem } from './components/TempTodoItem/TempTodoItem';
 
 export const App: React.FC = () => {
   // #region states
@@ -216,8 +215,8 @@ export const App: React.FC = () => {
               deletedTodos={deletedTodos}
               onUpdate={handleUpdateTodo}
               updatingIds={updatingIds}
+              tempTodo={tempTodo}
             />
-            {tempTodo && <TempTodoItem todo={tempTodo} isLoading />}
           </section>
           {todos.length > 0 && (
             <TodoFilter
