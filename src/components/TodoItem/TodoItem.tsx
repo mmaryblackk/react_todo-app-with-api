@@ -57,13 +57,7 @@ export const TodoItem: React.FC<Props> = ({
     }
 
     if (!editTitle.trim()) {
-      try {
-        await handleDelete();
-      } catch {
-        setTimeout(() => {
-          editInputField.current?.focus();
-        }, 0);
-      }
+      await handleDelete();
 
       return;
     }
@@ -82,9 +76,6 @@ export const TodoItem: React.FC<Props> = ({
       }
     } catch {
       // Error is handled in onUpdate
-      setTimeout(() => {
-        editInputField.current?.focus();
-      }, 0);
     }
   };
 
